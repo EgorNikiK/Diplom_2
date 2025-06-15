@@ -14,7 +14,6 @@ def create_order(create_user):
 @pytest.fixture
 def create_orders(create_user):
     token = create_user['token']
-    # Создаем два заказа
     order_1 = OrderApiHelper.create_order([Order.main], token)
     order_2 = OrderApiHelper.create_order([Order.bun], token)
     return [order_1, order_2]
@@ -49,7 +48,6 @@ class TestGetOrder:
     def test_get_user_orders_with_authorization(self, create_orders):
         orders_list = OrderApiHelper.request_user_orders_list(create_orders[0]['token'])
         assert orders_list.status_code == 200
-
-        created_order_ids = [order['id'] for order in create_orders]
         response_order_ids = [order['id'] for order in orders_list.json()]
-        assert all(order_id in response_order_ids for order_id in created_order_ids)
+        for created_order in create_orders:
+            assert created_order['id'] in response_order_ids
